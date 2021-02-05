@@ -53,6 +53,10 @@ def start_tunnel(tun_name, peer_IP):
             (tun_name, LOCAL_IP, peer_IP, MTU)).read()
 
 
+def get_format_now():
+    return time.strftime('[%Y/%m/%d %H:%M:%S] ')
+
+
 class Server():
 
     '''
@@ -148,6 +152,8 @@ class Server():
             for session in self.sessions:
                 if (time.time() - session['last_time']) > 60:
                     self.del_session_by_tun(session['tun_fd'])
+                    if DEBUG:
+                        print('Session: %s:%s expired!' % session['addr'])
             time.sleep(True)
 
     '''
@@ -172,10 +178,14 @@ class Server():
             return False
         if data == b'e':
             self.del_session_by_tun(tun_fd)
+            if DEBUG:
+                print("Client %s:%s is disconnect" % addr)
             return False
         if data == PASSWORD:
             return True
         else:
+            if DEBUG:
+                print('Clinet %s:%s connect failed' % addr)
             return False
 
     '''
@@ -202,6 +212,9 @@ class Server():
             for r in readab:
                 if r == self.udp:
                     data, addr = self.udp.recvfrom(BUFFER_SIZE)
+                    if DEBUG:
+                        print(get_format_now()+'from    (%s:%s)' %
+                              addr, data[:10])
                     try:
                         tun_fd = self.get_tun_by_addr(addr)
                         try:
@@ -210,6 +223,8 @@ class Server():
                             if not self.auth(addr, data, tun_fd):
                                 continue
                             self.create_session(addr)
+                            if DEBUG:
+                                print('Clinet %s:%s connect successful' % addr)
                     except OSError:
                         continue
                 else:
@@ -217,6 +232,9 @@ class Server():
                         addr = self.get_addr_by_tun(r)
                         data = os.read(r, BUFFER_SIZE)
                         self.udp.sendto(data, addr)
+                        if DEBUG:
+                            print(get_format_now()+'to      (%s:%s)' %
+                                  addr, data[:10])
                     except Exception:
                         continue
 
