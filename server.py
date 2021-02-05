@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+'''
+struct 是一个将Python的数据类型转换为C语言中的数据类型的字节流的模块
+fnctl.ioctl 用来对设备的一些特性进行控制，比如这里来设定要启用的虚拟网卡的类型和网卡名称
+select 是 I/O多路复用 的一个实现，用来在单线程中高效的利用网络I/O
+ipaddress 模块是Python3新增的模块，用来解析IP地址的
+'''
 import os
 import time
 import struct
@@ -18,6 +27,12 @@ MTU = 1400
 IPRANGE = list(map(str, ip_network(NETWORK)))[1:]
 LOCAL_IP = IPRANGE.pop(0)
 
+'''
+这三个常量实际上是定义在 linux/if_tun.h 这个头文件中，
+因为用Python来实现 tun 隧道,所以也需要使用这三个常量。
+TUNSETIFF 这个常量是告诉 ioctl 要完成虚拟网卡的注册，
+而IFF_TUN 和 IFF_TAP 则表示是要使用 tun 类型还是 tap 类型的虚拟网卡
+'''
 TUNSETIFF = 0x400454ca
 IFF_TUN = 0x0001
 IFF_TAP = 0x0002
