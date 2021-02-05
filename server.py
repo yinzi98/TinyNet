@@ -64,8 +64,8 @@ MTU 之所以设置为 1400 因为Linux默认网卡的 MTU 是 1500，
 
 
 def start_tunnel(tun_name, peer_IP):
-    os.open('ifconfig %s %s dstaddr %s mtu %s up' %
-            (tun_name, LOCAL_IP, peer_IP, MTU)).read()
+    os.popen('ifconfig %s %s dstaddr %s mtu %s up' %
+             (tun_name, LOCAL_IP, peer_IP, MTU)).read()
 
 
 def get_format_now():
